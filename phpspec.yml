@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: SendSMS
+        psr4_prefix: SendSMS
+        src_path: app
