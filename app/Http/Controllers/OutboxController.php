@@ -1,5 +1,5 @@
 <?php namespace App\Http\Controllers;
-use App\Message as Message;
+use App\Instruction as Message;
 class OutboxController extends Controller {
 
 	/*
@@ -28,7 +28,7 @@ class OutboxController extends Controller {
 	 */
 	public function index()
 	{
-        return Message::all();
+        return Instruction::all();
 	}
 
 }

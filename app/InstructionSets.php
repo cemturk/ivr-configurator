@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Outbox extends Model
+class InstructionSets extends Model
 {
     protected $fillable = [
-        'body',
+        'name','number','xml'
     ];
 }
