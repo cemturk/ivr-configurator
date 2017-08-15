@@ -1,11 +1,11 @@
 angular.module('CallLogsService', []).factory('CallLogs', ['$resource',
-  function($resource) {
-    return $resource('/api/calllogs/:callid', {
-      callid: '@id'
-    }, {
-      update: {
-        method: 'PUT'
-      }
-    });
-  }
+    function ($resource) {
+        return $resource('/api/call-logs/:callid', {
+            callid: '@id'
+        }, {
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
 ]);

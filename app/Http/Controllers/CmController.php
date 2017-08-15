@@ -4,7 +4,6 @@ use App\CallLogs as CallLogs;
 use App\Calls as Calls;
 use App\Instruction as Instructions;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class CmController extends Controller
 {
@@ -95,7 +94,7 @@ class CmController extends Controller
                 $details = 'direction : ' . $event['direction'];
                 break;
             case 'dtmf':
-                $details = 'digits : ' . $event['digits'];
+                $details = 'digits received : ' . $event['digits'];
                 break;
             case 'recorded':
                 $details = 'file-name : ' . $event['file-name'];
@@ -154,21 +153,5 @@ class CmController extends Controller
         return json_encode($ins);
     }
 
-    public function store(Request $request)
-
-    {
-        Log::info('received store callback');
-        return json_encode($request);
-    }
-
-    /**
-     * Send all calls to the view.
-     *
-     * @return Response
-     */
-    public function index(Request $request)
-    {
-        // return Calls::all();
-    }
 
 }

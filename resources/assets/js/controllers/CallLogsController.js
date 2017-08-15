@@ -2,7 +2,12 @@ angular.module('CallLogsController', []).controller('CallLogsController', ['$sco
     function ($scope, $location, $localStorage, CallLogs) {
         //get all messages
         $scope.findAll = function () {
-            $scope.messages = CallLogs.query();
-        }
+            $scope.calls = CallLogs.query();
+        };
+        $scope.show = function (call) {
+            console.log(call);
+            $scope.the_call = call;
+            $scope.call_logs = CallLogs.query({callid: call['call-id']});
+        };
     }
 ]);

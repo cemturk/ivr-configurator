@@ -2,6 +2,7 @@ body {
     padding-top: 70px;
     padding-bottom: 30px;
 }
+
 .cem-nav {
     position: fixed;
     top: 0;
@@ -10,9 +11,10 @@ body {
     z-index: 9000;
     background: #fff;
     border-top: solid 5px #259bdb;
-    box-shadow: 0 2px 0 0 rgba(0,0,0,.15);
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, .15);
     transition: all .8s;
 }
+
 .navbar-toggle .icon-bar {
     display: block;
     width: 22px;
@@ -20,15 +22,26 @@ body {
     border-radius: 1px;
     background-color: #60bcef;
 }
+
 .cm-logo-img {
     padding-top: 6px;
 }
+
 #loginbox {
     margin-top: 30px;
 }
 
 #loginbox > div:first-child {
     padding-bottom: 10px;
+}
+
+.calls-row {
+    cursor: pointer;
+    background-color: #ffffff;
+}
+
+.calls-row:nth-child(2) {
+    background-color: #dddddd;
 }
 
 .iconmelon {
@@ -51,7 +64,7 @@ body {
 
 .panel-body {
     padding-top: 30px;
-    background-color: rgba(2555,255,255,.3);
+    background-color: rgba(2555, 255, 255, .3);
 }
 
 #particles {
@@ -65,6 +78,7 @@ body {
     position: absolute;
     z-index: -2;
 }
+
 a:hover {
     text-decoration: none;
 }

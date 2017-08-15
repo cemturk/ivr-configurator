@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\CallLogs as CallLogs;
 use App\Calls as Calls;
 
 class CallLogsController extends Controller
@@ -31,7 +32,11 @@ class CallLogsController extends Controller
      */
     public function index()
     {
-        return Calls::all();
+        return Calls::get();
     }
 
+    public function show($id)
+    {
+        return CallLogs::where('call-id', $id)->get();
+    }
 }
