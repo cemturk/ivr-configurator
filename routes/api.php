@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,6 +13,8 @@ use Illuminate\Http\Request;
 
 Route::post('/user/login', 'UserController@login');
 Route::get('/user/getByToken', 'UserController@getByToken');
+
+Route::post('/cm/callback', 'CmController@callback');
 
 Route::resource('/config', 'ConfigController');
 Route::resource('/user', 'UserController');

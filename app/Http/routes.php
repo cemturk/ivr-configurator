@@ -30,15 +30,18 @@ Route::get('/partials/{category}/{action}/{id}', function ($category, $action = 
 // Additional RESTful routes.
 Route::post('/api/user/login', 'UserController@login');
 Route::get('/api/user/getByToken', 'UserController@getByToken');
+Route::post('/api/cm/callback', 'CmController@callback');
 
 // Getting RESTful
-Route::resource('/api/sendsms', 'SendSmsController');
+Route::resource('/api/config', 'SendSmsController');
 Route::resource('/api/user', 'UserController');
-Route::resource('/api/outbox', 'OutboxController');
+Route::resource('/api/calllogs', 'CallLogsController');
+Route::resource('/api/cm', 'CmController');
 
 // Catch all undefined routes. Always gotta stay at the bottom since order of routes matters.
 Route::any('{undefinedRoute}', function ($undefinedRoute) {
-    return view('layout');
+//    Log::info('received callback' . $undefinedRoute);
+//    return view('layout');
 })->where('undefinedRoute', '([A-z\d-\/_.]+)?');
 
 // Using different syntax for Blade to avoid conflicts with AngularJS.

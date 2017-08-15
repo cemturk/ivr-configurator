@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Instruction as Instructions;
 use App\InstructionSets as Config;
 use Illuminate\Http\Request;
@@ -53,7 +52,7 @@ class ConfigController extends Controller
             if (!Instructions::firstOrCreate(array(
                 'code' => $ins['id'],
                 'type' => $ins['type'],
-                'options' => json_encode($ins['options']),
+                'options' => str_replace('_', '-', json_encode($ins['options'])), //convert js object names to match cm api
                 'parentCode' => $ins['root'],
                 'isRoot' => $ins['isRoot'],
                 'set_id' => $set_id

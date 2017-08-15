@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CallLogs extends Model
+class Calls extends Model
 {
     protected $fillable = [
-        'call-id', 'instruction-id', 'event', 'details'
+        'call-id', 'from', 'to'
     ];
 }

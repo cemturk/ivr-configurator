@@ -93,7 +93,6 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 style[mxConstants.STYLE_ROUNDED] = '1';
                 style[mxConstants.STYLE_GLASS] = '1';
 
-                style[mxConstants.STYLE_IMAGE] = 'images/dude3.png';
                 style[mxConstants.STYLE_IMAGE_WIDTH] = '48';
                 style[mxConstants.STYLE_IMAGE_HEIGHT] = '48';
                 style[mxConstants.STYLE_SPACING] = 8;
@@ -123,7 +122,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 layout.edgeRouting = false;
                 layout.levelDistance = 60;
                 layout.nodeDistance = 16;
-                // Defines a new export action
+                // Defines a new save action
                 $scope.editor.addAction('save', function (editor, cell) {
                     var enc = new mxCodec(mxUtils.createXmlDocument());
                     var node = enc.encode($scope.editor.graph.getModel());
@@ -140,6 +139,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                                 isRoot: false
                             }
                         ;
+                        ins.options.instruction_id = ins.id;
                         if (vertex.id == 'treeRoot') {
                             ins.isRoot = 1;
                             ins.type = 'answer';
@@ -189,10 +189,6 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                     }
                 };
 
-                // Installs a popupmenu handler using local function (see below).
-                $scope.graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
-                    return createPopupMenu($scope.graph, menu, cell, evt);
-                };
 
                 // Fix for wrong preferred size
                 var oldGetPreferredSizeForCell = $scope.graph.getPreferredSizeForCell;
@@ -237,58 +233,42 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 var codec = new mxCodec(doc);
                 console.log($scope.config, doc.documentElement);
                 codec.decode(doc.documentElement, $scope.graph.getModel());
-                $scope.loadInstructions();
-                // Adds the root vertex of the tree
-                // $scope.graph.getModel().beginUpdate();
-                // try {
-                //   var w = $scope.graph.container.offsetWidth;
-                //   var v1 = $scope.graph.insertVertex(parent, 'treeRoot',
-                //     'Incoming Call', w / 2 - 30, 20, 140, 60, 'image=images/incoming.png;editable=0');
-                //   $scope.graph.updateCellSize(v1);
-                //   addOverlays($scope.graph, v1, false);
-                // } finally {
-                //   // Updates the display
-                //   $scope.graph.getModel().endUpdate();
-                // }
-
+                $scope.loadInstructions(); //add overlays for existing instructions
 
             }
         };
         $scope.handleDblClick = function (evt, cell) {
-            // Do not fire a DOUBLE_CLICK event here as mxEditor will
-            // consume the event and start the in-place editor.
-            console.log('dblclick', cell);
             if (cell != null && this.isCellEditable(cell)) {
 
                 switch (cell.type) {
                     case 'tts':
                         $scope.play = $scope.graph.model.cells[cell.id];
                         $('#play-modal').modal('show');
-                        $('#playprompt').val(cell.prompt);
+                        $('#playprompt').val(cell.options.prompt);
                         angular.element($('#playprompt')).triggerHandler('input');
                         break;
                     case 'spell':
                         $scope.spell = $scope.graph.model.cells[cell.id];
                         $('#spell-modal').modal('show');
-                        $('#spellprompt').val(cell.code);
+                        $('#spellprompt').val(cell.options.code);
                         angular.element($('#spellprompt')).triggerHandler('input');
                         break;
                     case 'dtmf':
                         $scope.dtmf = $scope.graph.model.cells[cell.id];
                         $('#dtmf-modal').modal('show');
-                        $('#dtmfprompt').val(cell.prompt);
+                        $('#dtmfprompt').val(cell.options.prompt);
                         angular.element($('#dtmfprompt')).triggerHandler('input');
                         break;
                     case 'dtmfr':
                         $scope.dtmfl = $scope.graph.model.cells[cell.id];
                         $('#dtmfl-modal').modal('show');
-                        $('#dtmfprompt').val(cell.value);
+                        $('#dtmfprompt').val(cell.options.value);
                         angular.element($('#dtmflvalue')).triggerHandler('input');
                         break;
                     case 'record':
                         $scope.record = $scope.graph.model.cells[cell.id];
                         $('#record-modal').modal('show');
-                        $('#recordprompt').val(cell.prompt);
+                        $('#recordprompt').val(cell.options.prompt);
                         angular.element($('#recordprompt')).triggerHandler('input');
                         break;
                     case 'endcall':
@@ -526,6 +506,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                     //set defaults for instructions
                     switch (type) {
                         case 'tts':
+                            vertex.options.type = 'play';
                             vertex.options.prompt = 'prompt#' + vertex.id;
                             vertex.options.prompt_type = 'TTS';
                             vertex.options.terminators = '*';
@@ -537,11 +518,13 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                             vertex.options.voice = voice;
                             break;
                         case 'dtmf':
+                            vertex.options.type = 'get-dtmf';
                             vertex.options.prompt = 'prompt#' + vertex.id;
                             vertex.options.invalid_prompt = 'invalid-prompt#' + vertex.id;
                             vertex.options.prompt_type = 'TTS';
-                            vertex.options.min_digits = 8;
-                            vertex.options.max_digits = 8;
+                            vertex.options.invalid_prompt_type = 'TTS';
+                            vertex.options.min_digits = 1;
+                            vertex.options.max_digits = 1;
                             vertex.options.max_attempts = 4;
                             vertex.options.regex = '[1-9]\\d*';
                             vertex.options.terminators = '#';
@@ -549,7 +532,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                             vertex.options.voice = voice;
                             break;
                         case 'dtmfr':
-                            vertex.options.value = 1;
+                            vertex.options.value = 'set the value to match';
                             break;
                         case 'record':
                             vertex.options.prompt = 'prompt#' + vertex.id;
@@ -634,14 +617,8 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 return true;
             });
             for (var i = 0; i < cells.length; i++) {
-                // var style = $scope.graph.getStylesheet().getDefaultVertexStyle();
-                // style[mxConstants.STYLE_IMAGE] = 'images/' + cells[i].type + '.png';
-                // cells[i].setStyle(style);
                 addOverlays($scope.graph, cells[i], true, cells[i].type);
-                // $scope.graph.cellLabelChanged(cells[i], cells[i].value + 'eefd', true);
             }
-            // console.log(cells);
-            // console.log($scope.graph.model.cells);
         };
 
         function deleteSubtree(graph, cell) {
