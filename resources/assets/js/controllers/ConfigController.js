@@ -542,6 +542,9 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                             vertex.options.terminators = '*';
                             vertex.options.voice = voice;
                             break;
+                        case 'endcall':
+                            vertex.options.type = 'disconnect';
+                            break;
                     }
                     console.log(vertex);
                     // Updates the geometry of the vertex with the
