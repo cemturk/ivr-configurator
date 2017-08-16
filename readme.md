@@ -65,7 +65,7 @@ Now you can browse the site  [http://localhost:8080](http://localhost:8080). ðŸ™
 #General Thoughts
 Chart like configurator makes it very easy to configure, you can view the current config nicely and add/set items very easily.
 The app can look a lot better with proper styling, also some custom actions like go to instruction can be added for control over IVR flow.
-
+Also IVR configurator should have a validator to check any possible dead-ends.
 TTS is the default option for all prompts for this app, also voice settings are not editable. 
 
 Instructions are stored as json strings in the db because they have variable number of properties. 
@@ -79,4 +79,7 @@ Also special thanks to Michael for assisting me with the small issues I had.
 #Feedback About Voice API
 Voice API uses hyphens in variables like prompt-type etc, this makes consistent naming of the properties in PHP or javascript  
 difficult as these languages don't allow hyphens in variable/object/property names, instead you could use underscore or camel casing.
+
+Also in the documentation here https://docs.cmtelecom.com/voice-api/v2.0#/events_(post_commands)%7Cnew_call_event
+the variable for the number that has been called is listed as "called" but in practice variable in Voice API is called "callee"
 

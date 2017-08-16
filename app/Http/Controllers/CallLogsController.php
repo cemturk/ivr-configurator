@@ -32,7 +32,7 @@ class CallLogsController extends Controller
      */
     public function index()
     {
-        return Calls::get();
+        return Calls::orderBy('created_at', 'desc')->get();
     }
 
     public function show($id)

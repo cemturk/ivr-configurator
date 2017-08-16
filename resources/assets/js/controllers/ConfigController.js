@@ -74,14 +74,14 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
                 style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_LEFT;
                 style[mxConstants.STYLE_SPACING_LEFT] = 54;
-
+                style[mxConstants.STYLE_SPACING_RIGHT] = 54;
                 style[mxConstants.STYLE_GRADIENTCOLOR] = '#7d85df';
                 style[mxConstants.STYLE_STROKECOLOR] = '#5d65df';
                 style[mxConstants.STYLE_FILLCOLOR] = '#adc5ff';
 
                 style[mxConstants.STYLE_FONTCOLOR] = '#1d258f';
-                style[mxConstants.STYLE_FONTFAMILY] = 'Verdana';
-                style[mxConstants.STYLE_FONTSIZE] = '12';
+                style[mxConstants.STYLE_FONTFAMILY] = 'Tahoma';
+                style[mxConstants.STYLE_FONTSIZE] = '11';
                 style[mxConstants.STYLE_FONTSTYLE] = '1';
 
                 style[mxConstants.STYLE_SHADOW] = '1';
@@ -168,8 +168,35 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
 
                     });
                 });
+                $scope.editor.addAction('zoom_in', function (editor, cell) {
+                    $scope.graph.zoomIn();
+                });
+                $scope.editor.addAction('zoom_out', function (editor, cell) {
+                    $scope.graph.zoomOut();
+                });
+                $scope.editor.addAction('actual_size', function (editor, cell) {
+                    $scope.graph.zoomActual();
+                });
+                $scope.editor.addAction('print', function (editor, cell) {
+                    var preview = new mxPrintPreview($scope.graph, 1);
+                    preview.open();
+                });
+                $scope.editor.addAction('poster_print', function (editor, cell) {
+                    var pageCount = mxUtils.prompt('Enter maximum page count', '1');
+
+                    if (pageCount != null) {
+                        var scale = mxUtils.getScaleForPageCount(pageCount, $scope.graph);
+                        var preview = new mxPrintPreview($scope.graph, scale);
+                        preview.open();
+                    }
+                });
                 var toolbar = document.getElementById('toolbarContainer');
                 addToolbarButton($scope.editor, toolbar, 'save', 'Save Configuration', 'images/save.gif');
+                addToolbarButton($scope.editor, toolbar, 'zoom_in', 'Zoom In', 'images/zoom_in32.png');
+                addToolbarButton($scope.editor, toolbar, 'zoom_out', 'Zoom Out', 'images/zoom_out32.png');
+                addToolbarButton($scope.editor, toolbar, 'actual_size', 'Actual Size', 'images/view_1_132.png');
+                addToolbarButton($scope.editor, toolbar, 'print', 'Print', 'images/print32.png');
+                addToolbarButton($scope.editor, toolbar, 'poster_print', 'Poster Print', 'images/press32.png');
                 // Allows the layout to move cells even though cells
                 // aren't movable in the graph
                 layout.isVertexMovable = function (cell) {
@@ -191,9 +218,9 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                     var result = oldGetPreferredSizeForCell.apply(this, arguments);
 
                     if (result != null) {
-                        result.width = Math.max(120, result.width - 40);
+                        result.width = Math.max(140, result.width - 10) + 30;
                     }
-
+                    console.log(result);
                     return result;
                 };
 
@@ -214,50 +241,13 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 codec.decode(doc.documentElement, $scope.graph.getModel());
                 $scope.loadInstructions(); //add overlays for existing instructions
 
-                //create a toolbar to zoom in/out and print functions
-                var content = document.createElement('div');
-                content.style.padding = '4px';
 
-                var tb = new mxToolbar(content);
-
-                tb.addItem('Zoom In', 'images/zoom_in32.png', function (evt) {
-                    $scope.graph.zoomIn();
-                });
-
-                tb.addItem('Zoom Out', 'images/zoom_out32.png', function (evt) {
-                    $scope.graph.zoomOut();
-                });
-
-                tb.addItem('Actual Size', 'images/view_1_132.png', function (evt) {
-                    $scope.graph.zoomActual();
-                });
-
-                tb.addItem('Print', 'images/print32.png', function (evt) {
-                    var preview = new mxPrintPreview($scope.graph, 1);
-                    preview.open();
-                });
-
-                tb.addItem('Poster Print', 'images/press32.png', function (evt) {
-                    var pageCount = mxUtils.prompt('Enter maximum page count', '1');
-
-                    if (pageCount != null) {
-                        var scale = mxUtils.getScaleForPageCount(pageCount, $scope.graph);
-                        var preview = new mxPrintPreview($scope.graph, scale);
-                        preview.open();
-                    }
-                });
-
-                wnd = new mxWindow('Tools', content, 0, 200, 200, 66, false);
-                wnd.setMaximizable(false);
-                wnd.setScrollable(false);
-                wnd.setResizable(false);
-                wnd.setVisible(true);
                 // Displays useful hints in a small semi-transparent box.
-                var hints = document.createElement('div');
+                var hints = document.getElementById('tipsContainer');
                 hints.style.position = 'absolute';
                 hints.style.overflow = 'hidden';
                 hints.style.width = '300px';
-                hints.style.top = '120px';
+                hints.style.top = '60px';
                 hints.style.height = '100px';
                 hints.style.right = '20px';
 
@@ -274,7 +264,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 mxUtils.writeln(hints, '- All instructions can have 1 sub instruction except Get DTMF');
                 mxUtils.writeln(hints, '- Only after Get DTMF instruction you can at DTMF Router Logic instructions');
                 mxUtils.writeln(hints, '- Click X icon to delete an instruction and its child instructions');
-                document.body.appendChild(hints);
+                //document.body.appendChild(hints);
             }
         };
         //opens instruction details on double click

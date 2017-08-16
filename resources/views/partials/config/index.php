@@ -2,6 +2,8 @@
     <h2>IVR Configurator</h2>
     <div class="container">
         <div id="toolbarContainer"></div>
+        <div id="tipsContainer"></div>
+        <div id="toolboxContainer"></div>
         <div id="outlineContainer"
              style="height:1000px;background:transparent;border-style:solid;border-color:lightgray;"></div>
     </div>

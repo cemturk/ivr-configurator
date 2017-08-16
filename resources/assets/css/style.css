@@ -40,7 +40,7 @@ body {
     background-color: #ffffff;
 }
 
-.calls-row:nth-child(2) {
+.calls-row:nth-child(even) {
     background-color: #dddddd;
 }
 

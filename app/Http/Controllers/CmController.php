@@ -87,7 +87,7 @@ class CmController extends Controller
         if ($type == 'new-call' && !Calls::firstOrCreate(array(
                 'call-id' => $event['call-id'],
                 'from' => $event['caller'],
-                'to' => $event['called']
+                'to' => $event['callee']
             ))) {
             abort(500, "Saving call failed.");
         }
@@ -109,11 +109,11 @@ class CmController extends Controller
         }
         if (!CallLogs::Create(Array(
             'call-id' => $event['call-id'],
-            'instruction-id' => $type == "new-call" ? "" : $event['instruction-id'],
+            'instruction-id' => (array_key_exists('instruction-id', $event)) ? $event['instruction-id'] : '',
             'event' => $event['type'],
             'details' => $details
         ))) {
-            abort(500, "Saving call logs failed.");
+            abort(500, "Saving call logs failed . ");
         }
     }
 
@@ -151,7 +151,7 @@ class CmController extends Controller
             'event' => $ins['type'],
             'details' => $details
         ))) {
-            abort(500, "Saving call logs failed.");
+            abort(500, "Saving call logs failed . ");
         }
         return json_encode($ins);
     }
