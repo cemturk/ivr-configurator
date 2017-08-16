@@ -72,7 +72,7 @@ Instructions are stored as json strings in the db because they have variable num
 
 All requests/responses to/from the backend are logged to make it easier to debug any potential problems.
 
-Overall it was fun to do this assessment, working with real services is always fun. 
+Overall it was fun to do this assessment, working with real services is always nice. 
 
 Also special thanks to Michael for assisting me with the small issues I had.
 
