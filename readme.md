@@ -22,7 +22,7 @@ npm install
 
 ### Database setup
 
-Edit `.env` according to your environment also provide CM telecom product token there
+Edit `.env` according to your environment 
 
 Run these commands to create the tables within the database you have already created.
 
