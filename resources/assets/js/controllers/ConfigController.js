@@ -59,11 +59,6 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 $scope.graph.centerZoom = false;
                 $scope.graph.panningHandler.useLeftButtonForPanning = true;
 
-                // Displays a popupmenu when the user clicks
-                // on a cell (using the left mouse button) but
-                // do not select the cell when the popup menu
-                // is displayed
-                $scope.graph.panningHandler.popupMenuHandler = false;
 
                 // Creates the outline (navigator, overview) for moving
                 // around the graph in the top, right corner of the window.
@@ -174,7 +169,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                     });
                 });
                 var toolbar = document.getElementById('toolbarContainer');
-                addToolbarButton($scope.editor, toolbar, 'save', 'Save', 'images/save.gif');
+                addToolbarButton($scope.editor, toolbar, 'save', 'Save Configuration', 'images/save.gif');
                 // Allows the layout to move cells even though cells
                 // aren't movable in the graph
                 layout.isVertexMovable = function (cell) {
@@ -207,23 +202,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                     return Math.min(1, state.view.scale);
                 };
 
-                // Dynamically adds text to the label as we zoom in
-                // (without affecting the preferred size for new cells)
-                $scope.graph.cellRenderer.getLabelValue = function (state) {
-                    var result = state.cell.value;
 
-                    if (state.view.graph.getModel().isVertex(state.cell)) {
-                        if (state.view.scale > 1) {
-                            result += '\nDetails 1';
-                        }
-
-                        if (state.view.scale > 1.3) {
-                            result += '\nDetails 2';
-                        }
-                    }
-
-                    return result;
-                };
                 // Shows a "modal" window when double clicking a vertex.
                 $scope.graph.dblClick = $scope.handleDblClick;
                 // Gets the default parent for inserting new cells. This
@@ -235,8 +214,70 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 codec.decode(doc.documentElement, $scope.graph.getModel());
                 $scope.loadInstructions(); //add overlays for existing instructions
 
+                //create a toolbar to zoom in/out and print functions
+                var content = document.createElement('div');
+                content.style.padding = '4px';
+
+                var tb = new mxToolbar(content);
+
+                tb.addItem('Zoom In', 'images/zoom_in32.png', function (evt) {
+                    $scope.graph.zoomIn();
+                });
+
+                tb.addItem('Zoom Out', 'images/zoom_out32.png', function (evt) {
+                    $scope.graph.zoomOut();
+                });
+
+                tb.addItem('Actual Size', 'images/view_1_132.png', function (evt) {
+                    $scope.graph.zoomActual();
+                });
+
+                tb.addItem('Print', 'images/print32.png', function (evt) {
+                    var preview = new mxPrintPreview($scope.graph, 1);
+                    preview.open();
+                });
+
+                tb.addItem('Poster Print', 'images/press32.png', function (evt) {
+                    var pageCount = mxUtils.prompt('Enter maximum page count', '1');
+
+                    if (pageCount != null) {
+                        var scale = mxUtils.getScaleForPageCount(pageCount, $scope.graph);
+                        var preview = new mxPrintPreview($scope.graph, scale);
+                        preview.open();
+                    }
+                });
+
+                wnd = new mxWindow('Tools', content, 0, 200, 200, 66, false);
+                wnd.setMaximizable(false);
+                wnd.setScrollable(false);
+                wnd.setResizable(false);
+                wnd.setVisible(true);
+                // Displays useful hints in a small semi-transparent box.
+                var hints = document.createElement('div');
+                hints.style.position = 'absolute';
+                hints.style.overflow = 'hidden';
+                hints.style.width = '300px';
+                hints.style.top = '120px';
+                hints.style.height = '100px';
+                hints.style.right = '20px';
+
+                hints.style.background = 'black';
+                hints.style.color = 'white';
+                hints.style.fontFamily = 'Arial';
+                hints.style.fontSize = '10px';
+                hints.style.padding = '4px';
+
+                mxUtils.setOpacity(hints, 50);
+
+                mxUtils.writeln(hints, '- Click + icon to add a new instruction');
+                mxUtils.writeln(hints, '- Doubleclick on a instruction to edit settings');
+                mxUtils.writeln(hints, '- All instructions can have 1 sub instruction except Get DTMF');
+                mxUtils.writeln(hints, '- Only after Get DTMF instruction you can at DTMF Router Logic instructions');
+                mxUtils.writeln(hints, '- Click X icon to delete an instruction and its child instructions');
+                document.body.appendChild(hints);
             }
         };
+        //opens instruction details on double click
         $scope.handleDblClick = function (evt, cell) {
             if (cell != null && this.isCellEditable(cell)) {
 
@@ -282,6 +323,8 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             // Disables any default behaviour for the double click
             mxEvent.consume(evt);
         };
+
+        //save functions for instruction edit modals
         $scope.save_dtmf = function () {
             console.log($scope.dtmf);
             $scope.graph.model.cells[$scope.dtmf.id] = $scope.dtmf;
@@ -313,6 +356,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             $('#spell-modal').modal('hide');
         };
 
+        //used to add buttons to the top toolbar like save button
         function addToolbarButton(editor, toolbar, action, label, image, isTransparent) {
             var button = document.createElement('button');
             button.style.fontSize = '10';
@@ -337,57 +381,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             toolbar.appendChild(button);
         };
 
-        // Function to create the entries in the popupmenu
-        function createPopupMenu(graph, menu, cell, evt) {
-            var model = graph.getModel();
-
-            if (cell != null) {
-                if (model.isVertex(cell)) {
-                    menu.addItem('Add child', 'images/overlays/check.png', function () {
-                        addChild(graph, cell);
-                    });
-                }
-
-                menu.addItem('Edit label', 'images/text.gif', function () {
-                    graph.startEditingAtCell(cell);
-                });
-
-                if (cell.id != 'treeRoot' &&
-                    model.isVertex(cell)) {
-                    menu.addItem('Delete', 'images/delete.gif', function () {
-                        deleteSubtree(graph, cell);
-                    });
-                }
-
-                menu.addSeparator();
-            }
-
-            menu.addItem('Fit', 'images/zoom.gif', function () {
-                graph.fit();
-            });
-
-            menu.addItem('Actual', 'images/zoomactual.gif', function () {
-                graph.zoomActual();
-            });
-
-            menu.addSeparator();
-
-            menu.addItem('Print', 'images/print.gif', function () {
-                var preview = new mxPrintPreview(graph, 1);
-                preview.open();
-            });
-
-            menu.addItem('Poster Print', 'images/print.gif', function () {
-                var pageCount = mxUtils.prompt('Enter maximum page count', '1');
-
-                if (pageCount != null) {
-                    var scale = mxUtils.getScaleForPageCount(pageCount, graph);
-                    var preview = new mxPrintPreview(graph, scale);
-                    preview.open();
-                }
-            });
-        };
-
+        //adds + and x buttons to instruction vertexes
         function addOverlays(graph, cell, addDeleteIcon, type) {
             if (type != 'endcall') {
                 var overlay = new mxCellOverlay(new mxImage('images/add.png', 24, 24), 'Add action');
@@ -415,6 +409,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             }
         };
 
+        //while adding a new instruction prompts to get child instruction type
         function askChildType(graph, cell) {
             var content = document.createElement('div');
             content.style.padding = '4px';
@@ -453,6 +448,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             showModalWindow(graph, 'Choose What to Add Next', content, 390, 90);
         }
 
+        //adds instructions
         function addChild(graph, cell, type) {
             console.log(cell.getEdgeCount());
             if ((cell.getEdgeCount() - 1 == 0 && cell.id != 'treeRoot') || (cell.id == 'treeRoot' && cell.getEdgeCount() == 0) || (type == 'dtmfr' && cell.id != 'treeRoot')) {
@@ -460,8 +456,6 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                 var model = graph.getModel();
                 var parent = graph.getDefaultParent();
                 var vertex;
-                // var style = graph.getStylesheet().getDefaultVertexStyle();
-                // style[mxConstants.STYLE_IMAGE] = 'images/' + type + '.png';
                 model.beginUpdate();
                 console.log(cell);
                 //set up initial label value
@@ -489,8 +483,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                         var label = 'Double click to set TTS';
                 }
                 try {
-                    // $scope.graph.insertVertex(parent, 'treeRoot',
-                    //         'Incoming Call', w / 2 - 30, 20, 140, 60, 'image=images/incoming.png;editable=0');
+                    //add instruction and set label and image
                     vertex = graph.insertVertex(parent, null, label, 10, 20, 140, 60, 'image=images/' + type + '.png;editable=1');
                     var geometry = model.getGeometry(vertex);
                     vertex.type = type;
@@ -546,7 +539,6 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
                             vertex.options.type = 'disconnect';
                             break;
                     }
-                    console.log(vertex);
                     // Updates the geometry of the vertex with the
                     // preferred size computed in the graph
                     var size = graph.getPreferredSizeForCell(vertex);
@@ -576,7 +568,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             }
         };
 
-
+        //shows modals within the graph
         function showModalWindow(graph, title, content, width, height) {
             var background = document.createElement('div');
             background.style.position = 'absolute';
@@ -609,7 +601,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             graph.tooltipHandler.hide();
             $scope.wnd.setVisible(true);
         };
-
+        //adds overlays while loading configuration from the db
         $scope.loadInstructions = function () {
             console.log($scope.graph.model.cells);
             // Gets the subtree from cell downwards
@@ -624,6 +616,7 @@ angular.module('ConfigController', []).controller('ConfigController', ['$scope',
             }
         };
 
+        //deletes instructions
         function deleteSubtree(graph, cell) {
             // Gets the subtree from cell downwards
             var cells = [];

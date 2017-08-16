@@ -8,10 +8,10 @@ class CallLogsController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Outbox Controller
+    | Call Logs Controller
     |--------------------------------------------------------------------------
     |
-    | This controller interacts with Outbox view
+    | This controller interacts with Call Logs view
     |
     */
 

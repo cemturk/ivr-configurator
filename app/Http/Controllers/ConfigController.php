@@ -13,7 +13,7 @@ class ConfigController extends Controller
     | Config Controller
     |--------------------------------------------------------------------------
     |
-    | This controller interacts with Send Message view, stores and send messages using CM Telecom Gateway
+    | This controller interacts with IVR Configurator view
     |
     */
 
@@ -29,20 +29,19 @@ class ConfigController extends Controller
 
 
     /**
-     * Create a message and send it
+     * Store configuration and send it
      *
      * @return response
      */
     public function store(Request $request)
     {
         $input = $request->input('config');
-        //save config xml
+        //save config graph xml
         if (!Config::where('id', $input['id'])
             ->update(['xml' => $input['xml']])) {
             abort(500, "Saving failed.");
         }
-        //update instructions
-
+        //wipe old instructions and replace them with new ones
         Instructions::where('set_id', $input['id'])
             ->delete();
         for ($i = 0; $i < count($input['instructions']); $i++) {
@@ -60,26 +59,14 @@ class ConfigController extends Controller
                 abort(500, "Saving instruction " . $ins['id'] . " failed.");
             }
         }
-//        $response = Cm::sendMessage($input['from'],$input['to'],$input['content']);
-//        if(strpos($response, 'ERROR')) {
-//            abort(422, $response);
-//        }
         return array('configuration_saved' . $input['id'] => true);
     }
 
+    //send configuration to view
     public function index(Request $request)
     {
         $id = $request->input('confId');
         return Config::find($id);
     }
 
-    /**
-     * Show the application welcome screen to the user.
-     *
-     * @return Response
-     */
-    public function show()
-    {
-        //return view('welcome');
-    }
 }

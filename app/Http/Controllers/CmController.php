@@ -28,6 +28,7 @@ class CmController extends Controller
     }
 
     /**
+     * callback end point for the Voice API
      * @param Request $request
      * @return json string
      */
@@ -75,6 +76,7 @@ class CmController extends Controller
 
 
     /**
+     * Stores events in db
      * @param $event
      */
     public function save_event($event)
@@ -116,6 +118,7 @@ class CmController extends Controller
     }
 
     /**
+     * Stores sent instructions in db
      * @param $instruction
      * @param $call_id
      * @return string

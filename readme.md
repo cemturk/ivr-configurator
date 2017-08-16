@@ -8,6 +8,7 @@ laravel backend also you can use angular for the front end, i used mysql for dat
 
 Provided authentication and JWT authorization infrastructure
 Created database migrations and seeder 
+Added a chart like IVR Configurator
 
 
 ## Installation
@@ -62,5 +63,20 @@ Now you can browse the site  [http://localhost:8080](http://localhost:8080). ðŸ™
 - MySQL
 
 #General Thoughts
-Work in progress
+Chart like configurator makes it very easy to configure, you can view the current config nicely and add/set items very easily.
+The app can look a lot better with proper styling, also some custom actions like go to instruction can be added for control over IVR flow.
+
+TTS is the default option for all prompts for this app, also voice settings are not editable. 
+
+Instructions are stored as json strings in the db because they have variable number of properties. 
+
+All requests/responses to/from the backend are logged to make it easier to debug any potential problems.
+
+Overall it was fun to do this assessment, working with real services is always fun. 
+
+Also special thanks to Michael for assisting me with the small issues I had.
+
+#Feedback About Voice API
+Voice API uses hyphens in variables like prompt-type etc, this makes consistent naming of the properties in PHP or javascript  
+difficult as these languages don't allow hyphens in variable/object/property names, instead you could use underscore or camel casing.
 
